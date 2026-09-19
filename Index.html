@@ -1,1 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#25150c">
+<title>The Hendrickson Family Cook Book</title>
 
+<!-- ================= CACHE CLEARING / AUTO-UPDATE =================
+  Every time you change ANYTHING on the site, change the version on the next line
+  (for example 2026-09-19.1 becomes 2026-09-20.1). Each visitor's browser checks this
+  line, throws away its old saved copy, and loads the new one automatically. -->
+<meta name="site-version" content="2026-09-19.1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<!-- ================================================================ -->
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+
+<!-- Rewritten by the Print window so the paper size is right. Leave it alone. -->
+<style id="dynPage">@page{size:8.5in 11in;margin:0}</style>
+
+<style>
+:root{
+  --PW:528px; --PH:816px;
+  --ink:#2b2017; --ink-soft:#5e4d3c; --red:#8a2b1d; --gold:#dcb867; --pen:#33405f;
+  --f-body:"EB Garamond","Garamond","Palatino Linotype",Georgia,serif;
+  --f-head:"IM Fell English","EB Garamond",Georgia,serif;
+  --f-sc:"IM Fell English SC","IM Fell English",Georgia,serif;
+  --f-hand:"Caveat","Segoe Script","Bradley Hand","Comic Sans MS",cursive;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45  0 0 0 0 .32  0 0 0 0 .15  0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{font-family:var(--f-body);color:#f0e2bd;background:#25150c;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font-family:inherit}
+:focus-visible{outline:2px solid #e8cd8a;outline-offset:2px}
+.modal :focus-visible{outline-color:var(--red)}
+
+/* ---------- the room around the book ---------- */
+#app{position:relative;display:flex;flex-direction:column;height:100vh;height:100dvh;
+  background:
+    radial-gradient(ellipse at 50% 38%,rgba(255,200,130,.17),transparent 62%),
+    radial-gradient(ellipse at 50% 125%,rgba(0,0,0,.6),transparent 60%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.13) 0 2px,transparent 2px 9px,rgba(255,220,170,.035) 9px 11px,transparent 11px 23px),
+    linear-gradient(#3a2415,#22130b)}
+.bar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top));
+  background:linear-gradient(#2b1a10,#1c0f08);border-bottom:1px solid #6a4a27;position:relative;z-index:20}
+.brand{font:400 20px/1 var(--f-head);color:#e8cd8a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.actions{display:flex;gap:8px;flex:none}
+.tbtn{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;background:rgba(255,235,190,.06);border:1px solid rgba(232,205,138,.4);
+  color:#f2e5c1;font:400 15px/1 var(--f-head);border-radius:3px;cursor:pointer}
+.tbtn:hover{background:rgba(255,235,190,.15)}
+.tbtn svg{width:17px;height:17px;flex:none}
+.tbtn.primary{background:#7d2618;border-color:#b6553f}
+.tbtn.primary:hover{background:#932e1e}
+
+#stage{flex:1;min-height:0;position:relative;display:flex;overflow:hidden;padding:14px}
+#stage.scroll{overflow-y:auto;overflow-x:hidden}
+#bookBox{margin:auto;position:relative;flex:none}
+#book{position:absolute;left:0;top:0;transform-origin:0 0;touch-action:pan-y}
+#shift{position:absolute;left:0;top:0;width:100%;height:100%;transition:transform .85s cubic-bezier(.45,.03,.25,1)}
+#stackL,#stackR{position:absolute;top:0;width:var(--PW);height:var(--PH);background:#d8c69b;pointer-events:none}
+#stackL{left:0}
+#stackR{left:var(--PW)}
+#book.single #stackR{left:0}
+#leaves{position:absolute;left:0;top:0;width:100%;height:100%;perspective:2600px;-webkit-perspective:2600px}
+
+.leaf{position:absolute;top:0;left:var(--PW);width:var(--PW);height:var(--PH);transform-origin:0 50%;
+  transform-style:preserve-3d;-webkit-transform-style:preserve-3d;
+  transition:transform .85s cubic-bezier(.45,.03,.25,1) var(--d,0ms);will-change:transform}
+#book.single .leaf{left:0}
+.leaf.flipped{transform:rotateY(-180deg)}
+.face{position:absolute;inset:0;overflow:hidden;background:#e9d9b0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face.back{transform:rotateY(180deg)}
+.face.is-cover{inset:-9px -11px -9px 0;overflow:visible;background:none}
+.shade{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .85s ease var(--d,0ms)}
+.front .shade{background:linear-gradient(90deg,rgba(35,18,4,0),rgba(35,18,4,.6))}
+.back .shade{opacity:1;background:linear-gradient(270deg,rgba(35,18,4,0),rgba(35,18,4,.6))}
+.flipped .front .shade{opacity:1}
+.flipped .back .shade{opacity:0}
+.no-anim .leaf,.no-anim .shade,.no-anim #shift{transition:none!important}
+#shift.no-anim{transition:none!important}
+
+.hot{position:absolute;top:70px;bottom:60px;width:54px;z-index:5000;border:0;padding:0;background:transparent;cursor:pointer;color:transparent;font:400 34px/1 var(--f-head);display:flex;align-items:center;justify-content:center}
+.hot.l{left:0}.hot.r{right:0}
+.hot.l:hover{background:linear-gradient(90deg,rgba(60,30,0,.22),transparent);color:rgba(60,30,0,.55)}
+.hot.r:hover{background:linear-gradient(270deg,rgba(60,30,0,.22),transparent);color:rgba(60,30,0,.55)}
+.hot.off{display:none}
+
+.nav{flex:none;display:flex;justify-content:center;align-items:center;gap:14px;padding:8px 12px;padding-bottom:calc(8px + env(safe-area-inset-bottom));
+  background:linear-gradient(#1d100a,#150b06);border-top:1px solid #4d331b;position:relative;z-index:20}
+.nav button{padding:8px 16px;min-width:92px;background:transparent;border:1px solid rgba(232,205,138,.4);color:#f2e5c1;font:400 16px/1 var(--f-head);border-radius:3px;cursor:pointer}
+.nav button:hover:not(:disabled){background:rgba(255,235,190,.14)}
+.nav button:disabled{opacity:.35;cursor:default}
+#label{min-width:150px;text-align:center;font:italic 400 17px var(--f-head);color:#e8cd8a}
+
+#hint{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);z-index:30;max-width:90vw;text-align:center;
+  background:rgba(20,10,4,.86);color:#f2e5c1;padding:9px 16px;border-radius:20px;font:italic 400 16px var(--f-head);pointer-events:none;transition:opacity .8s}
+#hint.gone{opacity:0}
+
+#searchPanel{position:absolute;left:0;right:0;z-index:19;background:#1c0f08;border-bottom:1px solid #6a4a27;padding:12px;box-shadow:0 14px 30px rgba(0,0,0,.55)}
+#searchPanel input{width:100%;max-width:560px;display:block;margin:0 auto;padding:10px 12px;font:400 18px var(--f-body);background:#f6ecd0;color:var(--ink);border:1px solid #b39a63;border-radius:3px}
+#results{max-width:560px;margin:8px auto 0;max-height:46vh;overflow:auto}
+#results button{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid rgba(232,205,138,.18);color:#f2e5c1;padding:9px 6px;cursor:pointer;font:400 17px var(--f-body)}
+#results button:hover{background:rgba(255,235,190,.1)}
+#results small{display:block;color:#bfa872;font:italic 400 14px var(--f-body)}
+#results .none{color:#bfa872;font:italic 400 16px var(--f-body);padding:8px 6px}
+
+/* ---------- a single printed page (528 x 816) ---------- */
+.pg{position:absolute;inset:0;overflow:hidden;color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.42;
+  background-color:#efe1bc;
+  background-image:var(--noise),radial-gradient(ellipse at 50% 45%,#f7edd2 0%,#f0e3c0 62%,#e3cf9f 100%);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pg::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(circle at var(--fx1,20%) var(--fy1,30%),rgba(150,95,30,.17) 0 5px,transparent 22px),
+    radial-gradient(circle at var(--fx2,80%) var(--fy2,70%),rgba(150,95,30,.13) 0 4px,transparent 18px),
+    radial-gradient(circle at var(--fx3,60%) var(--fy3,12%),rgba(150,95,30,.10) 0 3px,transparent 14px),
+    radial-gradient(circle at var(--rx,75%) var(--ry,80%),transparent 0 46px,rgba(120,75,25,var(--ring,0)) 47px 49px,transparent 53px)}
+.pg.sc{box-shadow:inset 0 0 55px rgba(139,90,30,.28),inset 0 0 5px rgba(80,50,20,.4)}
+.pg.sc::after{content:"";position:absolute;top:0;bottom:0;width:15%;pointer-events:none;z-index:3}
+.pg.sc.right::after{left:0;background:linear-gradient(90deg,rgba(60,35,10,.34),rgba(60,35,10,.10) 40%,transparent)}
+.pg.sc.left::after{right:0;background:linear-gradient(270deg,rgba(60,35,10,.34),rgba(60,35,10,.10) 40%,transparent)}
+.pg.k-cover,.pg.k-back{background:none;box-shadow:none}
+.pg.k-cover::before,.pg.k-back::before,.pg.k-cover::after,.pg.k-back::after{display:none}
+
+.pg-in{position:absolute;inset:0;z-index:1;padding:64px 50px 66px;display:flex;flex-direction:column}
+.pg-in.center{align-items:center;justify-content:center;text-align:center}
+.runhead{position:absolute;z-index:2;top:30px;left:50px;right:50px;text-align:center;font:italic 400 14px var(--f-head);color:var(--ink-soft);
+  border-bottom:1px solid rgba(60,40,20,.25);padding-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folio{position:absolute;z-index:2;bottom:28px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:10px;font:italic 400 16px var(--f-head);color:var(--ink-soft)}
+.folio i{width:26px;border-top:1px solid rgba(60,40,20,.4)}
+
+.pg-tools{position:absolute;z-index:8;top:9px;display:flex;gap:4px;opacity:0;transition:opacity .2s}
+.pg.right .pg-tools,.pg.k-x .pg-tools{right:12px}
+.pg.left .pg-tools{left:12px}
+.pg:hover .pg-tools,.pg-tools:focus-within{opacity:1}
+@media (hover:none){.pg-tools{opacity:.75}}
+.ptool{width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(255,248,225,.75);border:1px solid rgba(90,60,25,.45);border-radius:3px;color:var(--ink-soft);cursor:pointer}
+.ptool:hover{background:#fff8e1;color:var(--red)}
+.ptool svg{width:16px;height:16px}
+
+/* recipe header */
+.rhead{flex:none;text-align:center;margin-bottom:8px}
+.rhead h2{margin:0;font:400 31px/1.12 var(--f-head);color:#1f160f}
+.rhead .from{margin-top:5px;font:italic 400 16px var(--f-body);color:var(--ink-soft)}
+.rhead .from em{font-style:normal;color:var(--ink)}
+.orn{display:block;margin:9px auto 4px;width:150px;height:13px;color:var(--red)}
+.orn.big{width:200px;height:16px}
+.meta{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 20px;margin-top:6px;font-size:14.5px}
+.meta i{color:var(--red);margin-right:4px}
+.rhead.cont{margin-bottom:2px}
+.rhead.cont h2{font-size:21px}
+.rhead.cont small{font:italic 400 15px var(--f-body);color:var(--ink-soft)}
+
+.flow{flex:1 1 0;min-height:0;overflow:hidden;margin-top:4px}
+.flow h3{margin:13px 0 6px;padding-bottom:2px;font:italic 400 20px/1.1 var(--f-head);color:var(--red);border-bottom:1px solid rgba(138,43,29,.35)}
+.flow h3.letter{font:400 23px/1.1 var(--f-head);margin:10px 0 3px;border-bottom-color:rgba(138,43,29,.22)}
+.flow h4{margin:9px 0 3px;font:italic 400 16px var(--f-body);color:var(--ink)}
+.ing{position:relative;padding-left:17px;margin:0 0 2px}
+.ing::before{content:"";position:absolute;left:4px;top:.68em;width:5px;height:5px;background:var(--red);transform:rotate(45deg)}
+.step{display:flex;gap:9px;margin:0 0 7px}
+.step .n{flex:none;width:22px;text-align:right;font:400 18px/1.25 var(--f-head);color:var(--red)}
+.step p{margin:0;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+.note{position:relative;margin:14px 6px 4px;padding:10px 14px 9px;background:rgba(255,250,232,.6);border:1px solid rgba(120,90,50,.28);
+  box-shadow:0 1px 3px rgba(60,40,10,.22);transform:rotate(-.7deg);font:500 20px/1.15 var(--f-hand);color:var(--pen)}
+.note::before{content:"";position:absolute;top:-9px;left:50%;width:70px;height:18px;margin-left:-35px;background:rgba(232,210,140,.55);transform:rotate(1.5deg);box-shadow:0 1px 1px rgba(60,40,10,.12)}
+.photo{width:64%;height:170px;margin:6px auto 8px;background-size:cover;background-position:center;border:7px solid #fbf6e6;border-bottom-width:16px;
+  box-shadow:0 2px 6px rgba(50,30,10,.4);transform:rotate(1.1deg)}
+
+/* index and lists */
+button.ix{all:unset;box-sizing:border-box;display:flex;align-items:baseline;width:100%;padding:3px 0;cursor:pointer;font:400 16px/1.25 var(--f-body);color:var(--ink)}
+button.ix:hover .t{color:var(--red)}
+button.ix:focus-visible{outline:2px solid var(--red);outline-offset:1px}
+.ix .t{flex:none;max-width:82%}
+.dots{flex:1;min-width:14px;margin:0 6px;border-bottom:2px dotted rgba(60,40,20,.45);transform:translateY(-3px)}
+.lead{display:flex;align-items:baseline;padding:2px 0}
+.term{margin:0 0 6px;text-align:left}
+.term b{font-weight:700;color:var(--red)}
+
+/* front matter */
+.tp h1{margin:0;font:400 27px/1.15 var(--f-sc);letter-spacing:.09em;color:#1f160f}
+.tp h1 em{display:block;font:400 46px/1.15 var(--f-sc);font-style:normal;letter-spacing:.05em;margin:4px 0 6px}
+.tp .sub{font:italic 400 19px/1.35 var(--f-head);color:var(--ink-soft);margin:14px 0 30px}
+.tp .by{font:400 18px/1.4 var(--f-head)}
+.tp .by b{display:block;font:400 30px/1.2 var(--f-head);color:var(--red);margin-top:2px}
+.tp .ed{margin-top:34px;font:italic 400 16px var(--f-head);color:var(--ink-soft)}
+.wel{justify-content:flex-start}
+.wel .dedic{text-align:center;font:italic 400 18px/1.4 var(--f-head);color:var(--ink-soft);margin:0 12px 6px}
+.wel .body p{margin:0 0 10px;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+.wel .body p.dc::first-letter{font:400 50px/.85 var(--f-head);float:left;padding:6px 8px 0 0;color:var(--red)}
+.wel .sign{text-align:right;font:500 30px/1.1 var(--f-hand);color:var(--pen);margin:6px 18px 0}
+.wel .contact{margin-top:auto;text-align:center;font:italic 400 16px/1.35 var(--f-body);color:var(--ink-soft);border-top:1px solid rgba(60,40,20,.25);padding-top:10px}
+.endpaper-pattern{position:absolute;inset:0;z-index:0;opacity:.2;
+  background:repeating-linear-gradient(45deg,var(--red) 0 1px,transparent 1px 16px),repeating-linear-gradient(-45deg,var(--red) 0 1px,transparent 1px 16px)}
+.plate{width:78%;padding:34px 22px 28px;text-align:center;background:#f3e7c6;border:2px solid var(--red);box-shadow:inset 0 0 0 5px #f3e7c6,inset 0 0 0 6px var(--red)}
+.plate .a{font:400 28px/1.1 var(--f-head)}
+.plate .b{font:italic 400 18px var(--f-head);color:var(--ink-soft);margin:6px 0 30px}
+.plate .line{border-bottom:1.5px solid var(--ink-soft);margin:0 14px 26px}
+.plate .c{font:italic 400 15px/1.35 var(--f-body);color:var(--ink-soft)}
+.lines{flex:1 1 0;min-height:0;margin-top:6px;background-image:repeating-linear-gradient(to bottom,transparent 0 27px,rgba(60,70,110,.30) 27px 28px);background-position:0 4px}
+
+/* the cover */
+.cover{position:absolute;inset:0;--cg:#dcb867;color:var(--cg);padding:24px 20px 24px 28px;display:flex;border-radius:3px 7px 7px 3px;
+  background:
+    radial-gradient(ellipse at 28% 18%,rgba(255,255,255,.12),transparent 55%),
+    radial-gradient(ellipse at 85% 95%,rgba(0,0,0,.4),transparent 60%),
+    repeating-linear-gradient(45deg,rgba(0,0,0,.11) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(-45deg,rgba(0,0,0,.11) 0 1px,transparent 1px 3px),
+    #5b1f18;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.4),inset 0 0 40px rgba(0,0,0,.35);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cover::after{content:"";position:absolute;left:0;top:0;bottom:0;width:18px;pointer-events:none;border-radius:3px 0 0 3px;
+  background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.08) 55%,rgba(255,255,255,.10) 68%,transparent)}
+.cover.back{border-radius:7px 3px 3px 7px;padding:24px 28px 24px 20px}
+.cover.back::after{left:auto;right:0;border-radius:0 3px 3px 0;background:linear-gradient(270deg,rgba(0,0,0,.55),rgba(0,0,0,.08) 55%,rgba(255,255,255,.10) 68%,transparent)}
+.cover .frame{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;padding:30px 22px;
+  border:2px solid var(--cg);box-shadow:inset 0 0 0 6px transparent,inset 0 0 0 7px var(--cg)}
+.cover .corner{position:absolute;width:44px;height:44px;color:var(--cg)}
+.cover .tl{left:5px;top:5px}
+.cover .tr{right:5px;top:5px;transform:scaleX(-1)}
+.cover .bl{left:5px;bottom:5px;transform:scaleY(-1)}
+.cover .br{right:5px;bottom:5px;transform:scale(-1,-1)}
+.cover .medal{width:118px;height:118px;border-radius:50%;border:2px solid var(--cg);box-shadow:inset 0 0 0 5px transparent,inset 0 0 0 6px var(--cg);display:flex;align-items:center;justify-content:center}
+.cover .medal svg{width:70px;height:54px}
+.cover h1{margin:0;font:400 26px/1.1 var(--f-sc);letter-spacing:.14em;color:var(--cg);text-shadow:0 -1px 0 rgba(255,240,190,.35),0 2px 3px rgba(0,0,0,.6)}
+.cover h1 .the{display:block;font:italic 400 26px var(--f-head);letter-spacing:.05em}
+.cover h1 .big{display:block;font-size:46px;letter-spacing:.05em;margin:6px 0 8px}
+.cover .sub{font:italic 400 18px/1.35 var(--f-head);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.cover .by{font:400 18px var(--f-head);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.cover .orn{color:var(--cg);margin:0 auto}
+.cover .emblem{width:84px;height:64px}
+
+/* ---------- pop-ups ---------- */
+.modal-backdrop{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(15,8,2,.68)}
+.modal{position:relative;width:100%;max-width:520px;max-height:92vh;max-height:92dvh;overflow:auto;padding:26px 28px 22px;color:var(--ink);
+  background-color:#f1e4c0;background-image:var(--noise);border:1px solid #6b4a26;box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 0 0 6px #f1e4c0,inset 0 0 0 7px rgba(138,43,29,.55);font:400 17px/1.45 var(--f-body)}
+.modal.wide{max-width:640px}
+.modal h2{margin:0 0 10px;font:400 28px/1.15 var(--f-head);color:#1f160f;text-align:center}
+.modal p{margin:0 0 12px}
+.modal a{color:var(--red)}
+.modal .btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:16px}
+.btn{padding:10px 18px;background:#7d2618;color:#faf0d6;border:1px solid #4e1409;border-radius:3px;font:400 17px/1 var(--f-head);cursor:pointer;box-shadow:inset 0 0 0 2px rgba(255,235,190,.18)}
+.btn:hover{background:#932e1e}
+.btn.ghost{background:transparent;color:var(--ink);border-color:#8f7a55;box-shadow:none}
+.btn.ghost:hover{background:rgba(255,255,255,.4)}
+.modal label{display:block;font:italic 400 15px var(--f-body);color:var(--ink-soft);margin:0 0 3px}
+.modal input[type=text],.modal select,.modal textarea{width:100%;padding:8px 10px;font:400 17px/1.35 var(--f-body);color:var(--ink);background:rgba(255,252,240,.75);border:1px solid #b9a67c;border-radius:2px}
+.modal textarea{resize:vertical;min-height:96px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-bottom:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.fr sup,.fr sub{font-size:.62em;line-height:0}
+.fr{white-space:nowrap}
+.fld{margin-bottom:10px}
+.hintline{font:italic 400 14px var(--f-body);color:var(--ink-soft);margin:2px 0 0}
+.err{color:#9a1f10;font:italic 400 16px var(--f-body);min-height:1.2em;margin-top:6px}
+.opt{margin:0 0 9px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.opt label.rad{display:flex;gap:8px;align-items:flex-start;font:400 17px/1.35 var(--f-body);color:var(--ink);margin:0}
+.opt select{width:auto;max-width:100%}
+.info{font:italic 400 15.5px/1.4 var(--f-body);color:var(--ink-soft);background:rgba(255,255,255,.35);border-left:3px solid var(--red);padding:8px 12px;margin:10px 0}
+.row2{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.row2 label.chk{display:flex;gap:7px;align-items:center;font:400 16px var(--f-body);color:var(--ink);margin:0}
+.row2 label.sel{display:flex;gap:8px;align-items:center;font:400 16px var(--f-body);color:var(--ink);margin:0}
+#toast{position:fixed;left:50%;bottom:78px;z-index:10001;transform:translate(-50%,20px);opacity:0;pointer-events:none;max-width:88vw;text-align:center;
+  background:#f1e4c0;color:var(--ink);border:1px solid #6b4a26;padding:10px 18px;border-radius:3px;box-shadow:0 8px 24px rgba(0,0,0,.5);font:italic 400 17px var(--f-head);transition:opacity .3s,transform .3s}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:720px){
+  .tbtn span{display:none}
+  .tbtn{padding:8px 10px}
+  .brand{font-size:17px}
+  .nav button{min-width:78px;padding:8px 12px}
+  #label{min-width:110px;font-size:15px}
+  .modal{padding:22px 18px 18px}
+  .grid2{grid-template-columns:1fr}
+  .grid4{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .leaf,.shade,#shift{transition-duration:.01s!important;transition-delay:0s!important}
+}
+
+/* ---------- printing ---------- */
+#printRoot{display:none}
+.sheet{position:relative;overflow:hidden;background:#fff}
+.sheet.booklet{display:flex}
+.cell{position:relative;overflow:hidden;flex:none}
+.scaled{position:absolute;transform-origin:0 0}
+.fm{position:absolute;left:50%;width:1px;height:9px;background:#000;opacity:.55}
+.fm.t{top:0}.fm.b{bottom:0}
+#printRoot.plain{--red:#3a3a3a;--ink:#111;--ink-soft:#444}
+#printRoot.plain .pg{background:#fff!important}
+#printRoot.plain .pg::before{display:none}
+#printRoot.plain .note{background:none;box-shadow:none;border:1px solid #888}
+#printRoot.plain .note::before{display:none}
+#printRoot.plain .photo{filter:grayscale(1)}
+#printRoot.plain .endpaper-pattern{display:none}
+#printRoot.plain .plate{background:#fff}
+#printRoot.plain .cover{--cg:#111;background:#fff;box-shadow:none}
+#printRoot.plain .cover::after{display:none}
+#printRoot.plain .cover h1,#printRoot.plain .cover .sub,#printRoot.plain .cover .by{text-shadow:none}
+@media print{
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+  body>*:not(#printRoot):not(#defs){display:none!important}
+  #printRoot{display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sheet{break-after:page;page-break-after:always;break-inside:avoid}
+  .sheet:last-child{break-after:auto;page-break-after:auto}
+}
+
+/* off-screen ruler used to work out where each recipe splits across pages */
+#measure{position:fixed;left:-10000px;top:0;width:528px;height:816px;visibility:hidden;pointer-events:none}
+</style>
+</head>
+<body>
+
+<!-- little drawings reused around the book -->
+<svg id="defs" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="orn" viewBox="0 0 200 16">
+      <path d="M100 1.5 L107 8 L100 14.5 L93 8 Z" fill="currentColor"/>
+      <circle cx="84" cy="8" r="2" fill="currentColor"/><circle cx="116" cy="8" r="2" fill="currentColor"/>
+      <path d="M78 8 H10 M122 8 H190" stroke="currentColor" stroke-width="1" fill="none"/>
+      <path d="M10 8 q-4 -5 -8 0 q4 5 8 0 M190 8 q4 -5 8 0 q-4 5 -8 0" stroke="currentColor" stroke-width="1" fill="none"/>
+    </symbol>
+    <symbol id="corner" viewBox="0 0 60 60">
+      <g fill="none" stroke="currentColor" stroke-linecap="round">
+        <path d="M3 57 V10 Q3 3 10 3 H57" stroke-width="1.8"/>
+        <path d="M11 57 V20 Q11 11 20 11 H57" stroke-width="1"/>
+        <path d="M20 42 q9 -2 11 -11 q2 -9 11 -11" stroke-width="1.2"/>
+      </g>
+      <circle cx="15" cy="15" r="3" fill="currentColor"/>
+    </symbol>
+    <symbol id="bowl" viewBox="0 0 80 60">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 30 H72 Q70 52 40 54 Q10 52 8 30 Z"/>
+        <path d="M28 57 H52"/>
+        <path d="M28 22 q-6 -6 0 -12 q6 -6 0 -10 M40 22 q-6 -6 0 -12 q6 -6 0 -10 M52 22 q-6 -6 0 -12 q6 -6 0 -10"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="app">
+  <header class="bar" id="bar">
+    <div class="brand">The Hendrickson Family Cook Book</div>
+    <nav class="actions" aria-label="Book tools">
+      <button class="tbtn" id="btnIndex" title="Go to the index" aria-label="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Index</span>
+      </button>
+      <button class="tbtn" id="btnSearch" title="Search recipes" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg><span>Search</span>
+      </button>
+      <button class="tbtn primary" id="btnAdd" title="Add a recipe" aria-label="Add recipe">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Add recipe</span>
+      </button>
+      <button class="tbtn" id="btnPrint" title="Print or export" aria-label="Print">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg><span>Print</span>
+      </button>
+    </nav>
+  </header>
+
+  <div id="searchPanel" hidden>
+    <input id="q" type="search" placeholder="Search by recipe, cook, or ingredient" autocomplete="off" aria-label="Search recipes">
+    <div id="results"></div>
+  </div>
+
+  <main id="stage">
+    <div id="bookBox">
+      <div id="book">
+        <div id="shift">
+          <div id="stackL"></div>
+          <div id="stackR"></div>
+          <div id="leaves"></div>
+          <button class="hot l" id="hotL" aria-label="Previous page">&#8249;</button>
+          <button class="hot r" id="hotR" aria-label="Next page">&#8250;</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="hint">Tap the page edges, swipe, or use the arrow keys to turn pages</div>
+
+  <footer class="nav">
+    <button id="prev">Back</button>
+    <div id="label" aria-live="polite"></div>
+    <button id="next">Next</button>
+  </footer>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toast" role="status"></div>
+<div id="measure"><!-- ruler --></div>
+<div id="printRoot"></div>
+
+<script>
+/* =====================================================================
+   AUTO-UPDATE: when the version number in the <head> changes, this clears
+   the browser's saved copies and loads the new site. Nothing to edit here.
+   ===================================================================== */
+(function () {
+  var V = (document.querySelector('meta[name="site-version"]') || {}).content || '';
+  async function purge() {
+    try { if (window.caches) { var ks = await caches.keys(); for (var i = 0; i < ks.length; i++) await caches.delete(ks[i]); } } catch (e) {}
+    try { if (navigator.serviceWorker) { var rs = await navigator.serviceWorker.getRegistrations(); for (var j = 0; j < rs.length; j++) await rs[j].unregister(); } } catch (e) {}
+  }
+  async function check() {
+    try {
+      var last = localStorage.getItem('hfcb_site_version');
+      if (last !== V) { await purge(); localStorage.setItem('hfcb_site_version', V); }
+      if (!/^https?:/.test(location.protocol)) return;
+      var url = location.href.split('#')[0].split('?')[0];
+      var res = await fetch(url + '?nocache=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      var doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+      var m = doc.querySelector('meta[name="site-version"]');
+      var nv = m && m.content;
+      if (nv && nv !== V) {
+        var k = 'hfcb_reload_' + nv;
+        if (!sessionStorage.getItem(k)) {
+          sessionStorage.setItem(k, '1');
+          await purge();
+          location.replace(url + '?v=' + encodeURIComponent(nv) + location.hash);
+        }
+      }
+    } catch (e) {}
+  }
+  check();
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+})();
+</script>
+
+<script>
+(function () {
+'use strict';
+
+/* =====================================================================
+   1.  THINGS YOU CAN EDIT
+   ===================================================================== */
+
+const CONFIG = {
+  shortTitle: 'The Hendrickson Family Cook Book',
+  subtitle: 'Recipes handed down, written down, and passed around the table',
+  compiler: 'Brei',
+  edition: 'First Edition, 2026',
+  contactName: 'Brei',
+  contactPhone: '419-989-9090',
+  dedication: 'For the ones who cooked without measuring, and for the ones who tried to write it all down.',
+  welcomeTitle: 'Welcome to the Table',
+  welcome: [
+    'Every recipe in this book came out of somebody\u2019s kitchen: a stained index card, a page torn from a magazine, a method scribbled on the back of an envelope. Some were never written down at all until someone stood beside the stove and made a guess at the measurements.',
+    'We gathered what we could so the people we love, and the ones who come after us, can still taste home. Cook from it. Spill on it. Write in the margins. The blank pages at the back are there for exactly that.',
+    'If there is a dish missing that belongs here, tell us. A family cook book is never finished.'
+  ],
+  signOff: 'Brei'
+};
+
+/* ---------------------------------------------------------------------
+   THE RECIPES.  The ones below are SAMPLES: replace them with the real ones.
+   To add one, copy a whole { ... }, block, paste it in, and change the words.
+   They sort themselves alphabetically, so the order here does not matter.
+
+     title        the name of the dish
+     category     Breads & Biscuits, Desserts, Soups & Stews ... (your choice)
+     cook         who made it ("From the kitchen of ...")
+     year         optional, like "c. 1958"
+     yield        optional, like "12 biscuits" or "Serves 6"
+     prep, cookTime, temp    all optional
+     ingredients  one per line. A line starting with "# " becomes a heading.
+     directions   one step per line. A line starting with "# " becomes a heading.
+     story        optional handwritten-style note at the bottom
+     image        optional photo or scan of the original recipe card (a web address)
+     sortAs       optional: file it under a different name in the index
+   --------------------------------------------------------------------- */
+const RECIPES = [
+  {
+    title: 'Buttermilk Biscuits', category: 'Breads & Biscuits', cook: 'Grandma Ruth', year: 'c. 1958',
+    yield: '12 biscuits', prep: '15 min', cookTime: '12 to 15 min', temp: '450\u00B0F',
+    ingredients: [
+      '2 cups all-purpose flour', '1 Tbsp baking powder', '1/4 tsp baking soda', '1 tsp salt',
+      '6 Tbsp cold butter (or lard)', '3/4 to 1 cup cold buttermilk', 'Melted butter, for brushing'
+    ],
+    directions: [
+      'Heat the oven to 450\u00B0F. Grease a cast-iron skillet or line a baking sheet.',
+      'Whisk the flour, baking powder, baking soda, and salt together in a large bowl.',
+      'Cut in the cold butter with a fork or your fingertips until the mixture looks like coarse crumbs, with a few pea-sized bits left.',
+      'Make a well in the center and pour in 3/4 cup buttermilk. Stir just until the dough comes together. Add a splash more only if it is too dry, and do not overwork it.',
+      'Turn the dough out onto a floured board and pat it into a rectangle about 1 inch thick. Fold it in thirds like a letter, turn, and pat out again. Do this twice more.',
+      'Cut straight down with a floured biscuit cutter (do not twist) and set the biscuits close together so their sides touch.',
+      'Bake 12 to 15 minutes, until tall and golden. Brush the tops with melted butter and serve hot.'
+    ],
+    story: 'Grandma never measured a thing. She said the dough should feel like a baby\u2019s cheek: soft, but not sticky. This is our best attempt at writing that down.'
+  },
+  {
+    title: 'Sunday Pot Roast', category: 'Main Dishes', cook: 'Mom', year: 'c. 1985',
+    yield: 'Serves 6 to 8', prep: '20 min', cookTime: '3 1/2 hours', temp: '325\u00B0F',
+    ingredients: [
+      '3 to 4 lb chuck roast', '2 tsp salt', '1 tsp black pepper', '2 Tbsp oil or bacon drippings',
+      '1 large onion, sliced', '3 cloves garlic, minced', '2 cups beef broth', '1 Tbsp Worcestershire sauce',
+      '2 bay leaves', '1 tsp dried thyme',
+      '# The vegetables',
+      '4 large carrots, cut in chunks', '4 medium potatoes, quartered', '2 stalks celery, cut in chunks'
+    ],
+    directions: [
+      'Heat the oven to 325\u00B0F. Pat the roast dry and rub it all over with the salt and pepper.',
+      'Heat the oil in a heavy Dutch oven over medium-high heat. Brown the roast well, about 4 to 5 minutes per side. Set it aside.',
+      'In the same pot, cook the onion for 3 minutes, then the garlic for 30 seconds. Pour in the broth and scrape up all the browned bits.',
+      'Stir in the Worcestershire, bay leaves, and thyme. Set the roast back in the pot, cover tightly, and bake 2 1/2 hours.',
+      'Add the carrots, potatoes, and celery around the roast. Cover and bake 1 hour more, until everything is fork-tender.',
+      'Let the roast rest 10 minutes. Slice it and spoon the pan juices over the top. Thicken the gravy on the stove with a little cornstarch stirred into cold water, if you like.'
+    ],
+    story: 'Served every Sunday after church. Leftovers make the best sandwiches on Monday.'
+  },
+  {
+    title: 'Chicken & Dumplings', category: 'Soups & Stews', cook: 'Aunt Dot', year: 'c. 1972',
+    yield: 'Serves 6', prep: '30 min', cookTime: '1 1/2 hours',
+    ingredients: [
+      '1 whole chicken (3 to 4 lb)', '2 quarts water', '1 onion, quartered', '2 stalks celery', '2 carrots', '1 bay leaf', 'Salt and pepper',
+      '# For the dumplings',
+      '2 cups all-purpose flour', '1 Tbsp baking powder', '1 tsp salt', '3 Tbsp cold shortening or butter', '3/4 cup milk'
+    ],
+    directions: [
+      'Put the chicken, water, onion, celery, carrots, and bay leaf in a large pot. Bring to a boil, then reduce the heat and simmer, covered, for 1 hour.',
+      'Lift out the chicken and let it cool. Strain the broth, return it to the pot, and skim off the fat. Pull the meat from the bones and shred it.',
+      'Bring the broth back to a boil and season well with salt and pepper.',
+      'Stir the flour, baking powder, and salt together. Cut in the shortening, then stir in the milk to make a soft dough.',
+      'Drop the dough by spoonfuls into the boiling broth. Reduce the heat, cover, and simmer 15 minutes. Do not lift the lid.',
+      'Stir the shredded chicken back in, heat through, and serve in deep bowls.'
+    ],
+    story: 'Aunt Dot rolled hers thin and cut them in strips. Drop dumplings were for the lazy, she said, but she made them that way too when company was running late.'
+  },
+  {
+    title: 'Potato Salad', category: 'Salads', cook: 'Aunt Dot', year: 'c. 1975',
+    yield: 'Serves 8', prep: '25 min', cookTime: '20 min',
+    ingredients: [
+      '3 lb potatoes (Yukon Gold or red)', '6 hard-boiled eggs, chopped', '1 cup mayonnaise', '2 Tbsp yellow mustard',
+      '2 Tbsp sweet pickle relish', '1 Tbsp cider vinegar', '2 stalks celery, finely diced', '1/4 cup finely chopped onion',
+      'Salt and pepper', 'Paprika, for the top'
+    ],
+    directions: [
+      'Peel and cube the potatoes. Cover with cold salted water, bring to a boil, and cook until just tender, about 15 minutes. Drain and let them steam dry.',
+      'While the potatoes are still slightly warm, sprinkle them with the vinegar and a good pinch of salt.',
+      'Stir the mayonnaise, mustard, and relish together in a large bowl. Add the potatoes, eggs, celery, and onion, and fold gently.',
+      'Season to taste. Chill at least 2 hours, then dust with paprika before serving.'
+    ],
+    story: 'Always better the next day.'
+  },
+  {
+    title: 'Skillet Cornbread', category: 'Breads & Biscuits', cook: 'Grandpa Earl', year: 'c. 1961',
+    yield: '8 wedges', prep: '10 min', cookTime: '20 to 25 min', temp: '425\u00B0F',
+    ingredients: [
+      '1 1/2 cups yellow cornmeal', '1/2 cup all-purpose flour', '2 tsp baking powder', '1/2 tsp baking soda', '1 tsp salt',
+      '1 1/4 cups buttermilk', '1 egg', '4 Tbsp bacon drippings, divided'
+    ],
+    directions: [
+      'Put 2 Tbsp of the bacon drippings in a 10-inch cast-iron skillet and set it in the oven while it heats to 425\u00B0F.',
+      'Stir the cornmeal, flour, baking powder, baking soda, and salt together in a bowl.',
+      'Beat the buttermilk and egg together, then stir in the remaining 2 Tbsp of drippings. Pour into the dry ingredients and stir just until combined.',
+      'Carefully pour the batter into the hot skillet. It should sizzle.',
+      'Bake 20 to 25 minutes, until the edges are deep brown and a toothpick comes out clean. Turn out onto a plate, cut into wedges, and serve with plenty of butter.'
+    ],
+    story: 'No sugar in cornbread. Grandpa Earl would leave the table over it.'
+  },
+  {
+    title: 'Soup Beans', category: 'Soups & Stews', cook: 'Grandma Ruth', year: 'c. 1950',
+    yield: 'Serves 8', prep: '10 min, plus soaking overnight', cookTime: '3 hours',
+    ingredients: [
+      '1 lb dried pinto beans', '1 smoked ham hock (or 1/4 lb salt pork)', '1 medium onion, chopped',
+      '8 cups water, plus more as needed', 'Salt, to taste'
+    ],
+    directions: [
+      'Sort the beans and rinse them well. Cover with water by 2 inches and soak overnight. Drain.',
+      'Put the beans in a large pot with the ham hock, onion, and 8 cups fresh water. Bring to a boil, then reduce to a gentle simmer.',
+      'Cook, partly covered, 2 to 3 hours, adding hot water when needed, until the beans are creamy and tender.',
+      'Salt at the end, since salting early can keep the beans tough. Pull the meat from the hock and stir it back in.',
+      'Serve in bowls with a wedge of cornbread, chopped raw onion, and a bottle of hot sauce on the table.'
+    ],
+    story: 'A pot of beans on the back burner was as good as a welcome mat.'
+  },
+  {
+    title: 'Sugar Cookies', category: 'Cookies & Candy', cook: 'Mom', year: 'c. 1985',
+    yield: 'About 4 dozen', prep: '20 min, plus chilling', cookTime: '8 to 10 min', temp: '375\u00B0F',
+    ingredients: [
+      '1 cup butter, softened', '1 1/2 cups sugar', '2 eggs', '2 tsp vanilla', '2 3/4 cups all-purpose flour',
+      '2 tsp cream of tartar', '1 tsp baking soda', '1/4 tsp salt', 'Extra sugar, for rolling'
+    ],
+    directions: [
+      'Cream the butter and sugar until light and fluffy. Beat in the eggs and vanilla.',
+      'Stir the flour, cream of tartar, baking soda, and salt together. Mix into the butter mixture until a soft dough forms.',
+      'Chill the dough for 1 hour.',
+      'Heat the oven to 375\u00B0F. Roll the dough into 1-inch balls and roll each one in sugar. Place 2 inches apart on ungreased baking sheets.',
+      'Bake 8 to 10 minutes, until the edges are just set. Cool on the pan for 2 minutes, then move to a rack.'
+    ],
+    story: 'Roll them in cinnamon sugar and Dad will call them snickerdoodles and claim he invented them.'
+  },
+  {
+    title: 'Apple Stack Cake', category: 'Desserts', cook: 'Grandma Ruth', year: 'c. 1940',
+    yield: 'One tall cake, about 16 slices', prep: '1 hour', cookTime: '10 min per layer', temp: '375\u00B0F',
+    ingredients: [
+      '# For the apple filling',
+      '1 lb dried apples', '6 cups water', '3/4 cup brown sugar', '1 tsp cinnamon', '1/2 tsp allspice', '1/4 tsp ground cloves',
+      '# For the cake layers',
+      '1/2 cup shortening', '1 cup sugar', '1 cup sorghum or molasses', '2 eggs', '1 cup buttermilk',
+      '5 cups all-purpose flour, plus more for rolling', '1 tsp baking soda', '1 tsp baking powder', '1/2 tsp salt', '1 tsp ginger'
+    ],
+    directions: [
+      '# Make the filling',
+      'Put the dried apples and water in a large pot. Simmer, stirring now and then, about 45 minutes, until the apples are very soft and most of the water is gone.',
+      'Mash the apples with a fork or potato masher. Stir in the brown sugar and spices. Set aside to cool completely.',
+      '# Make the layers',
+      'Heat the oven to 375\u00B0F. Grease and flour the bottoms of six 8-inch round cake pans. If you own fewer pans, bake in batches.',
+      'Cream the shortening and sugar together. Beat in the sorghum, then the eggs, then the buttermilk.',
+      'Whisk together the flour, baking soda, baking powder, salt, and ginger. Stir into the wet ingredients to make a stiff dough.',
+      'Divide the dough into six equal pieces. On a floured board, pat or roll each piece into an 8-inch round and fit it into a pan.',
+      'Bake each layer 10 to 12 minutes, until firm and lightly browned. Cool 5 minutes in the pan, then turn out onto a rack.',
+      '# Stack it',
+      'Set the first layer on a plate and spread it with about 3/4 cup of the apple filling. Repeat with the remaining layers, leaving the top one bare, or dust it with powdered sugar.',
+      'Wrap the cake well and let it sit at least 2 days before slicing. The layers soften and the flavors come together. It is best on the third day.'
+    ],
+    story: 'Stack cakes were the wedding cakes of the mountains. Each neighbor brought a layer, and the bride\u2019s family stacked them with apples between. Grandma Ruth made hers with dried apples put up in the fall, and she never once served it fresh.'
+  }
+];
+
+/* =====================================================================
+   2.  THE MACHINERY  (no need to edit below this line)
+   ===================================================================== */
+
+const PW = 528, PH = 816;             // one book page, in CSS pixels (5.5 x 8.5 inches)
+const DUR = 850;                      // page-turn time in milliseconds
+const LS_RECIPES = 'hfcb_local_recipes_v1';
+const LS_PREFS = 'hfcb_print_prefs_v1';
+const PHONE_DIGITS = CONFIG.contactPhone.replace(/\D/g, '');
+
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cmp = (a, b) => String(a).localeCompare(String(b), 'en', { sensitivity: 'base', ignorePunctuation: true, numeric: true });
+const slugify = t => String(t).toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'recipe';
+
+/* 1/2 becomes a real fraction; 1 1/2 becomes 1 and a half */
+const GLYPH = { '1/2': '\u00BD', '1/4': '\u00BC', '3/4': '\u00BE' };
+const FRAC_RE = '1\\/2|1\\/3|2\\/3|1\\/4|3\\/4|1\\/8|3\\/8|5\\/8|7\\/8';
+function fracHTML(f) {
+  if (GLYPH[f]) return GLYPH[f];
+  const p = f.split('/');
+  return '<span class="fr"><sup>' + p[0] + '</sup>/<sub>' + p[1] + '</sub></span>';
+}
+function fmt(s) {
+  let t = esc(s);
+  t = t.replace(new RegExp('\\b(\\d{1,2})\\s+(' + FRAC_RE + ')(?![\\d\\/])', 'g'), (m, a, b) => a + fracHTML(b));
+  t = t.replace(new RegExp('(^|[^\\d\\/])(' + FRAC_RE + ')(?![\\d\\/])', 'g'), (m, p, b) => p + fracHTML(b));
+  return t;
+}
+function toEl(html) {
+  const t = document.createElement('template');
+  t.innerHTML = String(html).trim();
+  return t.content.firstElementChild || document.createElement('div');
+}
+function rnd(seed) { const x = Math.sin(seed * 12.9898) * 43758.5453; return x - Math.floor(x); }
+function agingStyle(idx) {
+  const v = (n, a, b) => (a + (b - a) * rnd(idx * 7 + n)).toFixed(1);
+  const ring = rnd(idx * 3 + 11) > 0.86 ? 0.17 : 0;
+  return '--fx1:' + v(1, 8, 92) + '%;--fy1:' + v(2, 6, 94) + '%;--fx2:' + v(3, 8, 92) + '%;--fy2:' + v(4, 6, 94) +
+    '%;--fx3:' + v(5, 8, 92) + '%;--fy3:' + v(6, 6, 94) + '%;--rx:' + v(7, 20, 80) + '%;--ry:' + v(8, 55, 90) + '%;--ring:' + ring;
+}
+
+const ICON_PRINT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg>';
+const ICON_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>';
+
+/* ---------- saved-on-this-device recipes ---------- */
+function loadLocal() { try { const a = JSON.parse(localStorage.getItem(LS_RECIPES) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function saveLocal(a) { try { localStorage.setItem(LS_RECIPES, JSON.stringify(a)); return true; } catch (e) { return false; } }
+function loadPrefs() {
+  const d = { paper: 'letter', plain: true, extras: false };
+  try { return Object.assign(d, JSON.parse(localStorage.getItem(LS_PREFS) || '{}')); } catch (e) { return d; }
+}
+function savePrefs(p) { try { localStorage.setItem(LS_PREFS, JSON.stringify(p)); } catch (e) {} }
+
+/* ---------- state ---------- */
+const S = { pages: [], N: 0, recipes: [], startBySlug: {}, indexIdx: 4, single: null, f: 0, nLeaves: 0, maxF: 0, leafEls: [], built: false, scale: 1 };
+const el = {
+  book: $('#book'), box: $('#bookBox'), shift: $('#shift'), leaves: $('#leaves'), stage: $('#stage'),
+  stackL: $('#stackL'), stackR: $('#stackR'), hotL: $('#hotL'), hotR: $('#hotR'),
+  label: $('#label'), prev: $('#prev'), next: $('#next'), hint: $('#hint')
+};
+
+/* =====================================================================
+   3.  BUILDING THE BOOK'S PAGES
+   ===================================================================== */
+
+function getRecipes() {
+  const stripArticle = t => t.replace(/^\s*(the|a|an)\s+/i, '').trim();
+  const base = RECIPES.map((r, i) => Object.assign({}, r, { id: 'r' + i, local: false }));
+  const loc = loadLocal().map(r => Object.assign({}, r, { local: true }));
+  const all = base.concat(loc).filter(r => r && r.title);
+  all.forEach(r => { r.sortKey = stripArticle(String(r.sortAs || r.title)); });
+  all.sort((a, b) => cmp(a.sortKey, b.sortKey) || cmp(a.title, b.title));
+  const seen = {};
+  all.forEach(r => {
+    let s = slugify(r.title);
+    if (seen[s]) { seen[s]++; s += '-' + seen[s]; } else { seen[s] = 1; }
+    r.slug = s;
+  });
+  return all;
+}
+
+/* Fill pages one item at a time, measuring in a hidden page, and start a new
+   page whenever the next item would spill over. */
+function paginate(headHTML, contHTML, items) {
+  const M = $('#measure');
+  const pages = [];
+  if (!items.length) items = [{ type: 'p', html: '<div></div>' }];
+  let i = 0, first = true;
+  while (i < items.length) {
+    M.innerHTML = '<div class="pg"><div class="pg-in">' + (first ? headHTML : contHTML) + '<div class="flow"></div></div></div>';
+    const flow = $('.flow', M);
+    let placed = 0;
+    while (i < items.length) {
+      const node = toEl(items[i].html);
+      flow.appendChild(node);
+      if (placed > 0 && flow.scrollHeight > flow.clientHeight + 1) { flow.removeChild(node); break; }
+      placed++; i++;
+    }
+    while (placed > 1 && i < items.length && items[i - 1].type === 'h') { flow.removeChild(flow.lastElementChild); i--; placed--; }
+    pages.push($('.pg-in', M).innerHTML);
+    first = false;
+  }
+  M.innerHTML = '';
+  return pages;
+}
+
+function recipeHead(r, cont) {
+  if (cont) return '<header class="rhead cont"><h2>' + fmt(r.title) + ' <small>(continued)</small></h2></header>';
+  const meta = [['Yield', r.yield], ['Prep', r.prep], ['Cook', r.cookTime], ['Oven', r.temp]]
+    .filter(x => x[1]).map(x => '<span><i>' + x[0] + '</i>' + fmt(x[1]) + '</span>').join('');
+  let from = '';
+  if (r.cook) from = 'From the kitchen of <em>' + esc(r.cook) + '</em>' + (r.year ? ', ' + esc(r.year) : '');
+  else if (r.year) from = esc(r.year);
+  return '<header class="rhead"><h2>' + fmt(r.title) + '</h2>' + (from ? '<div class="from">' + from + '</div>' : '') +
+    '<svg class="orn"><use href="#orn"/></svg>' + (meta ? '<div class="meta">' + meta + '</div>' : '') + '</header>';
+}
+
+function buildItems(r) {
+  const items = [];
+  const cssUrl = u => String(u).replace(/['")\\]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+  const sub = line => line.replace(/^#+\s*/, '');
+  if (r.image) items.push({ type: 'photo', html: '<div class="photo" style="background-image:url(\'' + cssUrl(r.image) + '\')"></div>' });
+  items.push({ type: 'h', html: '<h3>Ingredients</h3>' });
+  (r.ingredients || []).forEach(l => {
+    l = String(l).trim(); if (!l) return;
+    if (l.charAt(0) === '#') items.push({ type: 'h', html: '<h4>' + fmt(sub(l)) + '</h4>' });
+    else items.push({ type: 'ing', html: '<div class="ing">' + fmt(l) + '</div>' });
+  });
+  items.push({ type: 'h', html: '<h3>Directions</h3>' });
+  let n = 0;
+  (r.directions || []).forEach(l => {
+    l = String(l).trim(); if (!l) return;
+    if (l.charAt(0) === '#') { n = 0; items.push({ type: 'h', html: '<h4>' + fmt(sub(l)) + '</h4>' }); }
+    else { n++; items.push({ type: 'step', html: '<div class="step"><span class="n">' + n + '.</span><p>' + fmt(l) + '</p></div>' }); }
+  });
+  if (r.story) items.push({ type: 'note', html: '<div class="note">' + fmt(r.story) + '</div>' });
+  return items;
+}
+
+/* ----- indexes ----- */
+function indexHead(title, cont) {
+  if (cont) return '<header class="rhead cont"><h2>' + esc(title) + ' <small>(continued)</small></h2></header>';
+  return '<header class="rhead"><h2>' + esc(title) + '</h2><svg class="orn"><use href="#orn"/></svg></header>';
+}
+function groupEntries(entries, keyFn, sortKeys) {
+  const map = new Map();
+  entries.forEach(e => { const k = keyFn(e); if (!map.has(k)) map.set(k, []); map.get(k).push(e); });
+  const keys = Array.from(map.keys());
+  if (sortKeys) keys.sort(cmp);
+  return keys.map(k => ({ h: k, entries: map.get(k) }));
+}
+function indexItems(groups) {
+  const items = [];
+  groups.forEach(g => {
+    items.push({ type: 'h', html: '<h3 class="letter">' + esc(g.h) + '</h3>' });
+    g.entries.forEach(e => items.push({
+      type: 'e',
+      html: '<button type="button" class="ix" data-go="' + e.idx + '"><span class="t">' + fmt(e.title) + '</span><span class="dots"></span><span class="pn">' + (e.idx + 1) + '</span></button>'
+    }));
+  });
+  return items;
+}
+function indexPages(title, groups, label) {
+  return paginate(indexHead(title, false), indexHead(title, true), indexItems(groups))
+    .map(h => ({ kind: 'index', html: '<div class="pg-in">' + h + '</div>', head: 'Index', label: label }));
+}
+
+/* ----- fixed pages ----- */
+function coverHTML(back) {
+  const corners = ['tl', 'tr', 'bl', 'br'].map(c => '<svg class="corner ' + c + '"><use href="#corner"/></svg>').join('');
+  if (back) {
+    return '<div class="cover back"><div class="frame">' + corners +
+      '<div class="medal"><svg class="emblem"><use href="#bowl"/></svg></div>' +
+      '<div class="sub">Have a recipe the family should know?<br>Call or text ' + esc(CONFIG.contactName) + '<br>at ' + esc(CONFIG.contactPhone) + '</div></div></div>';
+  }
+  return '<div class="cover"><div class="frame">' + corners +
+    '<div class="medal"><svg class="emblem"><use href="#bowl"/></svg></div>' +
+    '<h1><span class="the">The</span><span class="big">Hendrickson</span>Family Cook Book</h1>' +
+    '<svg class="orn"><use href="#orn"/></svg>' +
+    '<div class="sub">' + esc(CONFIG.subtitle) + '</div>' +
+    '<div class="by">Gathered by ' + esc(CONFIG.compiler) + '</div></div></div>';
+}
+function endpaperHTML() {
+  return '<div class="endpaper-pattern"></div><div class="pg-in center"><div class="plate">' +
+    '<svg class="orn"><use href="#orn"/></svg><div class="a">This Cook Book</div><div class="b">belongs to</div><div class="line"></div>' +
+    '<div class="c">Made with love by the Hendrickson family, for everyone who has ever pulled up a chair at the table.</div>' +
+    '<svg class="orn"><use href="#orn"/></svg></div></div>';
+}
+function titleHTML() {
+  return '<div class="pg-in center tp"><svg class="orn big"><use href="#orn"/></svg>' +
+    '<h1>The<em>Hendrickson</em>Family Cook Book</h1><svg class="orn big"><use href="#orn"/></svg>' +
+    '<div class="sub">' + esc(CONFIG.subtitle) + '</div>' +
+    '<div class="by">Gathered and compiled by<b>' + esc(CONFIG.compiler) + '</b></div>' +
+    '<div class="ed">' + esc(CONFIG.edition) + '</div></div>';
+}
+function welcomeHTML() {
+  const paras = CONFIG.welcome.map((t, i) => '<p' + (i === 0 ? ' class="dc"' : '') + '>' + esc(t) + '</p>').join('');
+  return '<div class="pg-in wel"><div class="dedic">' + esc(CONFIG.dedication) + '</div>' +
+    '<header class="rhead"><h2>' + esc(CONFIG.welcomeTitle) + '</h2><svg class="orn"><use href="#orn"/></svg></header>' +
+    '<div class="body">' + paras + '</div><div class="sign">' + esc(CONFIG.signOff) + '</div>' +
+    '<div class="contact">Have a recipe the family should know? Call or text ' + esc(CONFIG.contactName) + ' at ' + esc(CONFIG.contactPhone) + '.</div></div>';
+}
+function notesHTML(i) {
+  const t = i === 0 ? 'Notes and Changes' : (i === 1 ? 'Family Memories' : 'Notes');
+  return '<div class="pg-in"><div class="rhead"><h2>' + t + '</h2><svg class="orn"><use href="#orn"/></svg></div><div class="lines"></div></div>';
+}
+function helpItems() {
+  const H = t => ({ type: 'h', html: '<h3>' + t + '</h3>' });
+  const L = (a, b) => ({ type: 'e', html: '<div class="lead"><span>' + a + '</span><span class="dots"></span><span>' + b + '</span></div>' });
+  const T = (a, b) => ({ type: 'e', html: '<div class="term"><b>' + a + '</b> ' + b + '</div>' });
+  return [
+    H('Measures'),
+    L('3 teaspoons', '1 tablespoon'), L('4 tablespoons', '\u00BC cup'), L('5 \u2153 tablespoons', '\u2153 cup'), L('8 tablespoons', '\u00BD cup'),
+    L('16 tablespoons', '1 cup'), L('1 stick of butter', '\u00BD cup'), L('1 cup', '8 fluid ounces'), L('2 cups', '1 pint'),
+    L('2 pints', '1 quart'), L('4 quarts', '1 gallon'),
+    H('Oven Heats'),
+    L('Slow oven', '250\u00B0 to 325\u00B0F'), L('Moderate oven', '350\u00B0 to 375\u00B0F'), L('Hot oven', '400\u00B0 to 425\u00B0F'), L('Very hot oven', '450\u00B0 to 500\u00B0F'),
+    H('A Few Good Substitutions'),
+    T('Buttermilk, 1 cup.', 'Stir 1 tablespoon of vinegar or lemon juice into 1 cup of milk and let it stand 5 minutes.'),
+    T('Self-rising flour, 1 cup.', 'Mix 1 cup of all-purpose flour with 1\u00BD teaspoons baking powder and \u00BC teaspoon salt.'),
+    T('Cake flour, 1 cup.', 'Take 2 tablespoons out of a cup of all-purpose flour and put in 2 tablespoons of cornstarch.'),
+    T('Brown sugar, 1 cup.', 'Mix 1 cup of white sugar with 1 tablespoon of molasses.'),
+    T('Baking powder, 1 teaspoon.', 'Mix \u00BC teaspoon baking soda with \u00BD teaspoon cream of tartar.'),
+    T('Sour cream, 1 cup.', 'Plain yogurt, cup for cup.'),
+    H('Old-Fashioned Terms'),
+    T('A pinch.', 'As much as you can hold between thumb and finger, about \u215B teaspoon.'),
+    T('A dash.', 'A quick shake, or two or three drops.'),
+    T('Butter the size of an egg.', 'About \u00BC cup, or half a stick.'),
+    T('Butter the size of a walnut.', 'About 1 to 2 tablespoons.'),
+    T('A gill.', '\u00BD cup, or 4 fluid ounces.'),
+    T('A wineglass.', 'About \u00BC cup.'),
+    T('A teacup.', 'About \u00BE cup.'),
+    T('Sweet milk.', 'Plain fresh milk, as opposed to sour milk or buttermilk.'),
+    T('Oleo.', 'Margarine.'),
+    T('Scald.', 'Heat milk until small bubbles form at the edge, just short of boiling.'),
+    T('Dredge.', 'Coat lightly with flour.'),
+    T('Cream.', 'Beat butter and sugar together until pale and fluffy.'),
+    T('A quick oven.', 'A hot oven, 400\u00B0 to 450\u00B0F.')
+  ];
+}
+
+/* Put every page together, in order, and work out the page numbers. */
+function assemble() {
+  S.recipes = getRecipes();
+  const recPages = S.recipes.map(r =>
+    paginate(recipeHead(r, false), recipeHead(r, true), buildItems(r)).map((h, j) => ({
+      kind: 'recipe', html: '<div class="pg-in">' + h + '</div>', head: r.category || 'Recipes',
+      label: r.title + (j ? ' (continued)' : ''), slug: r.slug, first: j === 0, rid: r.id, local: !!r.local
+    }))
+  );
+  const front = [
+    { kind: 'cover', label: 'Front cover', html: coverHTML(false) },
+    { kind: 'endpaper', label: 'Inside cover', html: endpaperHTML() },
+    { kind: 'title', label: 'Title page', html: titleHTML() },
+    { kind: 'welcome', label: 'A note to the family', head: 'Welcome', html: welcomeHTML() }
+  ];
+
+  // The index needs page numbers, and the page numbers depend on how long the
+  // index is, so keep going until the two agree.
+  let counts = { a: 1, c: 1, k: 1 }, A = [], C = [], K = [], starts = [];
+  for (let iter = 0; iter < 6; iter++) {
+    let cur = front.length + counts.a + counts.c + counts.k;
+    starts = recPages.map(p => { const s = cur; cur += p.length; return s; });
+    const ent = S.recipes.map((r, i) => ({ r: r, title: r.title, idx: starts[i] }));
+    A = indexPages('Recipes A to Z', groupEntries(ent, x => { const c = (x.r.sortKey || '').charAt(0).toUpperCase(); return /[A-Z]/.test(c) ? c : '#'; }, true), 'Index: A to Z');
+    C = indexPages('Recipes by Category', groupEntries(ent, x => x.r.category || 'Other', true), 'Index: by category');
+    K = indexPages('Recipes by Cook', groupEntries(ent, x => x.r.cook || 'Family favorites', true), 'Index: by cook');
+    if (A.length === counts.a && C.length === counts.c && K.length === counts.k) break;
+    counts = { a: A.length, c: C.length, k: K.length };
+  }
+
+  const help = paginate(indexHead('Kitchen Helps', false), indexHead('Kitchen Helps', true), helpItems())
+    .map(h => ({ kind: 'help', html: '<div class="pg-in">' + h + '</div>', head: 'Kitchen Helps', label: 'Kitchen Helps' }));
+
+  const pages = [].concat(front, A, C, K, [].concat.apply([], recPages), help);
+  // The whole book must be a multiple of 4 pages so it can be printed as a folded booklet.
+  let notes = (4 - ((pages.length + 1) % 4)) % 4;
+  if (notes === 0) notes = 4;
+  for (let i = 0; i < notes; i++) pages.push({ kind: 'notes', label: 'Notes', head: 'Notes', html: notesHTML(i) });
+  pages.push({ kind: 'back', label: 'Back cover', html: coverHTML(true) });
+
+  S.pages = pages; S.N = pages.length; S.indexIdx = front.length;
+  S.startBySlug = {};
+  S.recipes.forEach((r, i) => { S.startBySlug[r.slug] = starts[i]; });
+}
+
+/* =====================================================================
+   4.  DRAWING A PAGE  (used for the screen and for printing)
+   ===================================================================== */
+const NUMBERED = new Set(['welcome', 'index', 'recipe', 'help', 'notes']);
+
+function renderPage(idx, ctx) {
+  const p = S.pages[idx];
+  const scr = ctx === 'screen';
+  const side = (scr && S.single) ? 'right' : (idx % 2 === 0 ? 'right' : 'left');
+  let h = '<div class="pg k-' + p.kind + ' ' + side + (scr ? ' sc' : '') + '" data-idx="' + idx + '" style="' + agingStyle(idx) + '">' + p.html;
+  if (NUMBERED.has(p.kind)) {
+    h += '<div class="runhead">' + (idx % 2 === 0 ? esc(p.head || '') : esc(CONFIG.shortTitle)) + '</div>' +
+      '<div class="folio"><i></i><span>' + (idx + 1) + '</span><i></i></div>';
+  }
+  if (scr && p.kind !== 'cover' && p.kind !== 'back') {
+    h += '<div class="pg-tools"><button type="button" class="ptool" data-act="print-page" data-idx="' + idx + '" title="Print this page" aria-label="Print this page">' + ICON_PRINT + '</button>';
+    if (p.local) h += '<button type="button" class="ptool" data-act="remove" data-rid="' + esc(p.rid) + '" title="Remove from my copy" aria-label="Remove this recipe from my copy">' + ICON_TRASH + '</button>';
+    h += '</div>';
+  }
+  return h + '</div>';
+}
+
+/* =====================================================================
+   5.  THE BOOK ON SCREEN: leaves, flipping, sizing
+   ===================================================================== */
+function faceHTML(idx, front) {
+  const p = S.pages[idx];
+  const cov = p.kind === 'cover' || p.kind === 'back';
+  return '<div class="face ' + (front ? 'front' : 'back') + (cov ? ' is-cover' : '') + '">' + renderPage(idx, 'screen') + '<i class="shade"></i></div>';
+}
+function blankFace(seed) {
+  return '<div class="face back"><div class="pg k-blank right sc" style="' + agingStyle(seed + 500) + '"></div><i class="shade"></i></div>';
+}
+function buildLeaves() {
+  const dbl = !S.single;
+  const n = dbl ? S.N / 2 : S.N;
+  S.nLeaves = n;
+  S.maxF = dbl ? n : S.N - 1;
+  let html = '';
+  for (let i = 0; i < n; i++) {
+    html += '<div class="leaf">' + faceHTML(dbl ? 2 * i : i, true) + (dbl ? faceHTML(2 * i + 1, false) : blankFace(i)) + '</div>';
+  }
+  el.leaves.innerHTML = html;
+  S.leafEls = Array.from(el.leaves.children);
+}
+const fFromIdx = idx => clamp(S.single ? idx : Math.ceil(idx / 2), 0, S.maxF);
+function primaryIdx() {
+  if (S.single) return S.f;
+  const r = 2 * S.f, l = 2 * S.f - 1;
+  if (r < S.N && S.pages[r] && S.pages[r].kind === 'recipe') return r;
+  if (l >= 0 && S.pages[l] && S.pages[l].kind === 'recipe') return l;
+  return r < S.N ? r : l;
+}
+function setZ(leaf, i, flipped) { leaf.style.zIndex = flipped ? (i + 1) : (S.nLeaves - i); }
+
+function setInstant(f) {
+  el.book.classList.add('no-anim');
+  S.leafEls.forEach((leaf, i) => {
+    clearTimeout(leaf._t);
+    const fl = i < f;
+    leaf.classList.toggle('flipped', fl);
+    leaf.style.setProperty('--d', '0ms');
+    setZ(leaf, i, fl);
+  });
+  S.f = f;
+  syncUI();
+  void el.book.offsetWidth;
+  el.book.classList.remove('no-anim');
+}
+function goF(target) {
+  target = clamp(target, 0, S.maxF);
+  if (target === S.f) return;
+  const cur = S.f, dir = target > cur ? 1 : -1, count = Math.abs(target - cur);
+  const step = Math.min(80, 520 / count);
+  for (let k = 0; k < count; k++) {
+    const i = dir > 0 ? cur + k : cur - 1 - k;
+    const leaf = S.leafEls[i], delay = Math.round(k * step);
+    clearTimeout(leaf._t);
+    leaf.style.setProperty('--d', delay + 'ms');
+    leaf.style.zIndex = 500 + (dir > 0 ? i : S.nLeaves - i);
+    leaf.classList.toggle('flipped', dir > 0);
+    leaf._t = setTimeout(() => setZ(leaf, i, dir > 0), delay + DUR + 60);
+  }
+  S.f = target;
+  syncUI();
+  hideHint();
+}
+const flip = d => goF(S.f + d);
+const goToPage = idx => goF(fFromIdx(idx));
+
+function edgeShadow(count, dir) {
+  const cols = ['#cdb98c', '#efe3c3'], s = [];
+  for (let k = 1; k <= count; k++) s.push((dir * k * 2) + 'px ' + k + 'px 0 ' + cols[k % 2]);
+  s.push((dir * (count * 2 + 8)) + 'px ' + (count + 16) + 'px 30px rgba(0,0,0,.6)');
+  return s.join(',');
+}
+const layers = n => (n <= 0 ? 0 : clamp(Math.round(n * 6 / Math.max(1, S.nLeaves)), 1, 6));
+
+function pageLabel() {
+  const N = S.N;
+  if (S.single) return S.f === 0 ? 'Front cover' : (S.f === N - 1 ? 'Back cover' : 'Page ' + (S.f + 1) + ' of ' + N);
+  if (S.f === 0) return 'Front cover';
+  if (S.f === S.nLeaves) return 'Back cover';
+  return 'Pages ' + (2 * S.f) + ' and ' + (2 * S.f + 1) + ' of ' + N;
+}
+function syncUI() {
+  const dbl = !S.single;
+  let shift = 0;
+  if (dbl) { if (S.f === 0) shift = -PW / 2; else if (S.f === S.nLeaves) shift = PW / 2; }
+  el.shift.style.transform = 'translateX(' + shift + 'px)';
+  const rem = S.nLeaves - S.f;
+  const showR = dbl ? rem > 0 : S.f < S.maxF;
+  const showL = dbl && S.f > 0;
+  el.stackR.hidden = !showR; el.stackL.hidden = !showL;
+  if (showR) el.stackR.style.boxShadow = edgeShadow(layers(dbl ? rem : S.N - S.f), 1);
+  if (showL) el.stackL.style.boxShadow = edgeShadow(layers(S.f), -1);
+  el.label.textContent = pageLabel();
+  el.prev.disabled = S.f <= 0; el.next.disabled = S.f >= S.maxF;
+  el.hotL.classList.toggle('off', S.f <= 0);
+  el.hotR.classList.toggle('off', S.f >= S.maxF);
+  updateHash();
+}
+function updateHash() {
+  if (!S.built) return;
+  const i = primaryIdx(), p = S.pages[i];
+  const h = (p && p.kind === 'recipe' && p.slug) ? p.slug : (i > S.indexIdx ? 'p' + (i + 1) : '');
+  try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) {}
+}
+function idxFromHash() {
+  const h = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+  if (!h) return null;
+  let m = h.match(/^p(\d+)$/);
+  if (m) return clamp(parseInt(m[1], 10) - 1, 0, S.N - 1);
+  const i = S.pages.findIndex(p => p.kind === 'recipe' && p.first && p.slug === h);
+  return i >= 0 ? i : null;
+}
+function hideHint() { el.hint.classList.add('gone'); }
+
+/* Size the book to the window, and switch between two-page and one-page mode. */
+function layout(force, keepIdx) {
+  const cw = el.stage.clientWidth, ch = el.stage.clientHeight;
+  const availW = Math.max(200, cw - 28), availH = Math.max(200, ch - 28);
+  const single = availW < 800;
+  const bw = single ? PW : 2 * PW;
+  let s = Math.min(availW / bw, availH / PH, 1.5);
+  el.stage.classList.remove('scroll');
+  if (single && s < 0.62) { s = Math.min(availW / PW, 1.5); el.stage.classList.add('scroll'); }
+  s = Math.max(s, 0.2);
+  S.scale = s;
+  el.box.style.width = (bw * s) + 'px'; el.box.style.height = (PH * s) + 'px';
+  el.book.style.width = bw + 'px'; el.book.style.height = PH + 'px';
+  el.book.style.transform = 'scale(' + s + ')';
+  el.book.classList.toggle('single', single);
+  if (force || single !== S.single) {
+    const keep = keepIdx != null ? keepIdx : (S.built ? primaryIdx() : 0);
+    S.single = single;
+    buildLeaves();
+    setInstant(fFromIdx(clamp(keep, 0, S.N - 1)));
+  }
+}
+function rebuildBook() {
+  const keep = S.built ? primaryIdx() : 0;
+  assemble();
+  layout(true, keep);
+}
+
+/* =====================================================================
+   6.  POP-UPS
+   ===================================================================== */
+function openModal(html, cls) {
+  const root = $('#modalRoot');
+  root.innerHTML = '<div class="modal-backdrop"><div class="modal ' + (cls || '') + '" role="dialog" aria-modal="true">' + html + '</div></div>';
+  const bd = root.firstElementChild;
+  bd.addEventListener('mousedown', e => { if (e.target === bd) closeModal(); });
+  const m = bd.firstElementChild;
+  $$('[data-close]', m).forEach(b => b.addEventListener('click', closeModal));
+  setTimeout(() => { const f = $('input[type=text],textarea,select,.btn:not(.ghost)', m); if (f) f.focus(); }, 40);
+  return m;
+}
+function closeModal() { $('#modalRoot').innerHTML = ''; }
+const modalOpen = () => !!$('#modalRoot').firstChild;
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 3400);
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch (e) {
+    try {
+      const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok;
+    } catch (e2) { return false; }
+  }
+}
+
+/* ----- add a recipe ----- */
+function openAddNotice() {
+  const m = openModal(
+    '<h2>Adding a recipe</h2>' +
+    '<p>Adding a recipe will only be available to you on your version of the website. Please contact ' + esc(CONFIG.contactName) +
+    ' at <a href="tel:' + PHONE_DIGITS + '">' + esc(CONFIG.contactPhone) + '</a> to have her add your recipe to the family cook book if you wish for it to be included for everyone.</p>' +
+    '<div class="btns"><button type="button" class="btn ghost" data-close>Cancel</button><button type="button" class="btn" id="goAdd">Continue</button></div>');
+  $('#goAdd', m).addEventListener('click', openAddForm);
+}
+function linesOf(t) { return t.split(/\r?\n/).map(x => x.trim()).filter(Boolean); }
+function recipeToText(r) {
+  const L = [r.title];
+  if (r.category) L.push('Category: ' + r.category);
+  if (r.cook) L.push('From the kitchen of: ' + r.cook + (r.year ? ' (' + r.year + ')' : ''));
+  const meta = [['Makes', r.yield], ['Prep', r.prep], ['Cook', r.cookTime], ['Oven', r.temp]].filter(x => x[1]).map(x => x[0] + ': ' + x[1]).join('   ');
+  if (meta) L.push(meta);
+  L.push('', 'INGREDIENTS');
+  (r.ingredients || []).forEach(x => L.push(x.charAt(0) === '#' ? x.replace(/^#+\s*/, '') + ':' : '- ' + x));
+  L.push('', 'DIRECTIONS');
+  let n = 0;
+  (r.directions || []).forEach(x => { if (x.charAt(0) === '#') { n = 0; L.push(x.replace(/^#+\s*/, '') + ':'); } else L.push((++n) + '. ' + x); });
+  if (r.story) L.push('', 'NOTE: ' + r.story);
+  return L.join('\n');
+}
+function openAddForm() {
+  const std = ['Breakfast', 'Breads & Biscuits', 'Soups & Stews', 'Main Dishes', 'Sides & Vegetables', 'Salads', 'Desserts', 'Cookies & Candy', 'Canning & Preserving', 'Drinks', 'Holiday Favorites'];
+  const cats = Array.from(new Set(std.concat(S.recipes.map(r => r.category).filter(Boolean)))).sort(cmp);
+  const m = openModal(
+    '<h2>Add a recipe</h2>' +
+    '<div class="fld"><label for="f-title">Recipe name</label><input id="f-title" type="text" autocomplete="off"></div>' +
+    '<div class="grid2"><div><label for="f-cat">Category</label><input id="f-cat" type="text" list="f-cats" placeholder="Pick one or type your own" autocomplete="off"><datalist id="f-cats">' +
+    cats.map(c => '<option value="' + esc(c) + '">').join('') + '</datalist></div>' +
+    '<div><label for="f-cook">From the kitchen of</label><input id="f-cook" type="text" placeholder="Who made it?" autocomplete="off"></div></div>' +
+    '<div class="grid2"><div><label for="f-year">Year or era (optional)</label><input id="f-year" type="text" placeholder="c. 1965" autocomplete="off"></div>' +
+    '<div><label for="f-yield">Makes or serves (optional)</label><input id="f-yield" type="text" placeholder="Serves 6" autocomplete="off"></div></div>' +
+    '<div class="grid3"><div><label for="f-prep">Prep time</label><input id="f-prep" type="text" placeholder="15 min" autocomplete="off"></div>' +
+    '<div><label for="f-time">Cook time</label><input id="f-time" type="text" placeholder="1 hour" autocomplete="off"></div>' +
+    '<div><label for="f-temp">Oven</label><input id="f-temp" type="text" placeholder="350\u00B0F" autocomplete="off"></div></div>' +
+    '<div class="fld"><label for="f-ing">Ingredients, one per line</label><textarea id="f-ing" rows="6"></textarea>' +
+    '<p class="hintline">To add a heading, start the line with # (for example: # For the crust).</p></div>' +
+    '<div class="fld"><label for="f-dir">Directions, one step per line</label><textarea id="f-dir" rows="6"></textarea></div>' +
+    '<div class="fld"><label for="f-story">A note or story (optional)</label><textarea id="f-story" rows="3"></textarea></div>' +
+    '<div class="err" id="f-err" role="alert"></div>' +
+    '<div class="btns"><button type="button" class="btn ghost" data-close>Cancel</button><button type="button" class="btn" id="f-save">Save to my copy</button></div>', 'wide');
+  $('#f-save', m).addEventListener('click', () => {
+    const g = id => $('#' + id, m).value.trim();
+    const title = g('f-title'), ing = linesOf($('#f-ing', m).value), dir = linesOf($('#f-dir', m).value);
+    const err = $('#f-err', m);
+    if (!title) { err.textContent = 'Please give the recipe a name.'; $('#f-title', m).focus(); return; }
+    if (!ing.length) { err.textContent = 'Add at least one ingredient.'; $('#f-ing', m).focus(); return; }
+    if (!dir.length) { err.textContent = 'Add at least one step under Directions.'; $('#f-dir', m).focus(); return; }
+    const rec = {
+      id: 'local-' + Date.now(), title: title, category: g('f-cat') || 'Other', cook: g('f-cook'), year: g('f-year'),
+      yield: g('f-yield'), prep: g('f-prep'), cookTime: g('f-time'), temp: g('f-temp'), ingredients: ing, directions: dir, story: g('f-story')
+    };
+    const arr = loadLocal(); arr.push(rec);
+    if (!saveLocal(arr)) { err.textContent = 'This browser would not let the recipe be saved. If you are in a private window, try a regular one.'; return; }
+    closeModal();
+    rebuildBook();
+    const saved = S.recipes.find(r => r.id === rec.id);
+    const at = saved ? S.startBySlug[saved.slug] : null;
+    if (at != null) setTimeout(() => goToPage(at), 150);
+    setTimeout(() => openAddedModal(rec, at), 1300);
+  });
+}
+function openAddedModal(rec, at) {
+  const text = recipeToText(rec);
+  const m = openModal(
+    '<h2>Added to your copy</h2>' +
+    '<p>' + esc(rec.title) + (at != null ? ' is on page ' + (at + 1) + ', filed in alphabetical order.' : ' is saved.') +
+    ' It lives only on this device. If you would like it in the family cook book for everyone, send it to ' + esc(CONFIG.contactName) + ' at ' +
+    '<a href="tel:' + PHONE_DIGITS + '">' + esc(CONFIG.contactPhone) + '</a>.</p>' +
+    '<div class="btns"><button type="button" class="btn ghost" id="a-copy">Copy recipe text</button>' +
+    '<a class="btn ghost" id="a-sms" style="text-decoration:none" href="sms:' + PHONE_DIGITS + '?&body=' + encodeURIComponent(text) + '">Text it to ' + esc(CONFIG.contactName) + '</a>' +
+    '<button type="button" class="btn" data-close>Done</button></div>');
+  $('#a-copy', m).addEventListener('click', async () => { toast((await copyText(text)) ? 'Recipe copied. Paste it into a text or email.' : 'Could not copy. Try the text button instead.'); });
+}
+function removeLocal(rid) {
+  if (!confirm('Remove this recipe from your copy of the book? This will not affect anyone else\u2019s copy.')) return;
+  saveLocal(loadLocal().filter(r => r.id !== rid));
+  rebuildBook();
+  toast('Removed from your copy.');
+}
+
+/* ----- search ----- */
+function openSearch() {
+  const p = $('#searchPanel'); p.style.top = $('#bar').offsetHeight + 'px'; p.hidden = false;
+  $('#q').value = ''; $('#results').innerHTML = ''; setTimeout(() => $('#q').focus(), 30);
+}
+function closeSearch() { $('#searchPanel').hidden = true; }
+function runSearch(q) {
+  q = q.trim().toLowerCase();
+  const box = $('#results');
+  if (!q) { box.innerHTML = ''; return; }
+  const hits = S.recipes.map(r => {
+    let sc = 0; const t = r.title.toLowerCase();
+    if (t.indexOf(q) === 0) sc += 100; else if (t.indexOf(q) > -1) sc += 60;
+    if ((r.cook || '').toLowerCase().indexOf(q) > -1) sc += 30;
+    if ((r.category || '').toLowerCase().indexOf(q) > -1) sc += 25;
+    if ((r.ingredients || []).join(' ').toLowerCase().indexOf(q) > -1) sc += 15;
+    if ((r.story || '').toLowerCase().indexOf(q) > -1) sc += 8;
+    return { r: r, sc: sc };
+  }).filter(x => x.sc > 0).sort((a, b) => b.sc - a.sc).slice(0, 12);
+  box.innerHTML = hits.length ? hits.map(h =>
+    '<button type="button" data-go="' + S.startBySlug[h.r.slug] + '">' + esc(h.r.title) +
+    '<small>' + esc([h.r.category, h.r.cook].filter(Boolean).join(', ')) + ' (page ' + (S.startBySlug[h.r.slug] + 1) + ')</small></button>').join('')
+    : '<div class="none">No recipes match that yet.</div>';
+}
+
+/* =====================================================================
+   7.  PRINTING
+   ===================================================================== */
+const PAPER = { letter: { w: 816, h: 1056 }, a4: { w: 793.7, h: 1122.5 } };   // portrait sheet, CSS pixels
+const SKIP_PLAIN = new Set(['cover', 'endpaper', 'back', 'notes']);
+const printPageList = extras => S.pages.map((p, i) => i).filter(i => extras || !SKIP_PLAIN.has(S.pages[i].kind));
+
+function buildPrintHTML(o) {
+  const P = PAPER[o.paper] || PAPER.letter;
+  const booklet = o.mode === 'booklet';
+  const sw = booklet ? P.h : P.w, sh = (booklet ? P.w : P.h) - 1;
+  const cell = (idx, cw, ch, pad) => {
+    if (idx == null || idx < 0 || idx >= S.N) return '<div class="cell" style="width:' + cw + 'px;height:' + ch + 'px"></div>';
+    const s = Math.min((cw - 2 * pad) / PW, (ch - 2 * pad) / PH);
+    const left = (cw - PW * s) / 2, top = (ch - PH * s) / 2;
+    return '<div class="cell" style="width:' + cw + 'px;height:' + ch + 'px"><div class="scaled" style="width:' + PW + 'px;height:' + PH +
+      'px;left:' + left + 'px;top:' + top + 'px;transform:scale(' + s + ')">' + renderPage(idx, 'print') + '</div></div>';
+  };
+  let out = '';
+  if (booklet) {
+    const N = S.N, cw = sw / 2;
+    for (let k = 0; k < N / 4; k++) {
+      [[N - 1 - 2 * k, 2 * k], [2 * k + 1, N - 2 - 2 * k]].forEach(pair => {
+        out += '<section class="sheet booklet" style="width:' + sw + 'px;height:' + sh + 'px">' + cell(pair[0], cw, sh, 0) + cell(pair[1], cw, sh, 0) + '<i class="fm t"></i><i class="fm b"></i></section>';
+      });
+    }
+  } else {
+    const list = o.mode === 'page' ? [o.pageIdx] : printPageList(o.extras);
+    list.forEach(i => { out += '<section class="sheet" style="width:' + sw + 'px;height:' + sh + 'px">' + cell(i, sw, sh, 36) + '</section>'; });
+  }
+  return out;
+}
+function pageRule(o) {
+  const sz = o.paper === 'a4' ? ['210mm', '297mm'] : ['8.5in', '11in'];
+  return '@page{size:' + (o.mode === 'booklet' ? sz[1] + ' ' + sz[0] : sz[0] + ' ' + sz[1]) + ';margin:0}';
+}
+function runPrint(o) {
+  savePrefs({ paper: o.paper, plain: o.plain, extras: o.extras });
+  const root = $('#printRoot');
+  root.className = o.plain ? 'plain' : 'aged';
+  root.innerHTML = buildPrintHTML(o);
+  $('#dynPage').textContent = pageRule(o);
+  setTimeout(() => window.print(), 250);
+}
+function openPrintModal(defIdx) {
+  const pr = loadPrefs();
+  const pageOpts = S.pages.map((p, i) => '<option value="' + i + '"' + (i === defIdx ? ' selected' : '') + '>Page ' + (i + 1) + ': ' + esc(p.label || '') + '</option>').join('');
+  const m = openModal(
+    '<h2>Print or save a copy</h2>' +
+    '<div class="opt"><label class="rad"><input type="radio" name="pm" value="page" checked><span><b>One page</b></span></label><select id="pp" aria-label="Which page">' + pageOpts + '</select></div>' +
+    '<div class="opt"><label class="rad"><input type="radio" name="pm" value="book"><span><b>The whole book</b>, one page to a sheet</span></label></div>' +
+    '<div class="opt"><label class="rad"><input type="radio" name="pm" value="booklet"><span><b>The whole book as a booklet</b>, with the pages arranged so you can fold and staple it into a real little book</span></label></div>' +
+    '<p class="info" id="pinfo"></p>' +
+    '<div class="row2"><label class="sel">Paper <select id="ppaper"><option value="letter">US Letter (8.5 x 11)</option><option value="a4">A4</option></select></label>' +
+    '<label class="chk"><input type="checkbox" id="pplain"> Plain white paper (saves ink)</label>' +
+    '<label class="chk" id="pxwrap"><input type="checkbox" id="pextras"> Include covers and blank note pages</label></div>' +
+    '<div class="btns"><button type="button" class="btn ghost" data-close>Cancel</button><button type="button" class="btn" id="pgo">Print or save as PDF</button></div>', 'wide');
+  $('#ppaper', m).value = pr.paper; $('#pplain', m).checked = !!pr.plain; $('#pextras', m).checked = !!pr.extras;
+  const mode = () => $('input[name=pm]:checked', m).value;
+  function refresh() {
+    const md = mode(), N = S.N;
+    $('#pp', m).disabled = md !== 'page';
+    $('#pxwrap', m).style.display = md === 'book' ? '' : 'none';
+    let t;
+    if (md === 'page') t = 'Prints just the page you choose, enlarged to fill the sheet.';
+    else if (md === 'book') t = 'Prints ' + printPageList($('#pextras', m).checked).length + ' pages, one to a sheet. Good for a three-ring binder or for handing out single recipes.';
+    else t = 'Uses ' + (N / 4) + ' sheets of paper (' + (N / 2) + ' printed sides). In the print window, choose 2-sided and flip on the short edge. Then stack the sheets, fold them in half, and staple along the fold.';
+    $('#pinfo', m).textContent = t;
+  }
+  m.addEventListener('change', refresh); refresh();
+  $('#pgo', m).addEventListener('click', () => {
+    const o = { mode: mode(), paper: $('#ppaper', m).value, plain: $('#pplain', m).checked, extras: $('#pextras', m).checked, pageIdx: parseInt($('#pp', m).value, 10) };
+    closeModal(); runPrint(o);
+  });
+}
+window.addEventListener('beforeprint', () => {
+  const r = $('#printRoot');
+  if (!r.firstChild && S.pages.length) { r.className = 'plain'; r.innerHTML = buildPrintHTML({ mode: 'page', paper: 'letter', plain: true, pageIdx: primaryIdx(), extras: false }); }
+});
+window.addEventListener('afterprint', () => { $('#printRoot').innerHTML = ''; });
+
+/* =====================================================================
+   8.  WIRING IT ALL TOGETHER
+   ===================================================================== */
+function bind() {
+  el.prev.addEventListener('click', () => flip(-1));
+  el.next.addEventListener('click', () => flip(1));
+  el.hotL.addEventListener('click', () => flip(-1));
+  el.hotR.addEventListener('click', () => flip(1));
+  $('#btnIndex').addEventListener('click', () => { closeSearch(); goToPage(S.indexIdx); });
+  $('#btnAdd').addEventListener('click', openAddNotice);
+  $('#btnPrint').addEventListener('click', () => { closeSearch(); openPrintModal(primaryIdx()); });
+  $('#btnSearch').addEventListener('click', () => { $('#searchPanel').hidden ? openSearch() : closeSearch(); });
+  $('#q').addEventListener('input', e => runSearch(e.target.value));
+  $('#results').addEventListener('click', e => {
+    const b = e.target.closest('[data-go]'); if (!b) return;
+    closeSearch(); goToPage(parseInt(b.dataset.go, 10));
+  });
+  document.addEventListener('click', e => {
+    const sp = $('#searchPanel');
+    if (!sp.hidden && !e.target.closest('#searchPanel') && !e.target.closest('#btnSearch')) closeSearch();
+  });
+
+  el.leaves.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (go) { goToPage(parseInt(go.dataset.go, 10)); return; }
+    const act = e.target.closest('[data-act]');
+    if (act) {
+      if (act.dataset.act === 'print-page') { const pr = loadPrefs(); runPrint({ mode: 'page', paper: pr.paper, plain: pr.plain, extras: false, pageIdx: parseInt(act.dataset.idx, 10) }); }
+      else if (act.dataset.act === 'remove') removeLocal(act.dataset.rid);
+      return;
+    }
+    const cov = e.target.closest('.face.is-cover');
+    if (cov) { const pg = $('.pg', cov); if (pg && parseInt(pg.dataset.idx, 10) === 0) flip(1); else flip(-1); }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { if (modalOpen()) closeModal(); else closeSearch(); return; }
+    if (modalOpen() || e.target.closest('input,textarea,select')) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); flip(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); flip(-1); }
+    else if (e.key === 'Home') { e.preventDefault(); goF(0); }
+    else if (e.key === 'End') { e.preventDefault(); goF(S.maxF); }
+  });
+
+  let tx = 0, ty = 0, tt = 0;
+  el.stage.addEventListener('touchstart', e => { const t = e.changedTouches[0]; tx = t.clientX; ty = t.clientY; tt = Date.now(); }, { passive: true });
+  el.stage.addEventListener('touchend', e => {
+    const t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+    if (Date.now() - tt < 900 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.6) flip(dx < 0 ? 1 : -1);
+  }, { passive: true });
+
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => layout(false), 120); });
+  window.addEventListener('hashchange', () => { const i = idxFromHash(); if (i != null) goToPage(i); });
+}
+
+async function loadFonts() {
+  if (!document.fonts || !document.fonts.load) return;
+  const specs = ['400 16px "EB Garamond"', 'italic 400 16px "EB Garamond"', '700 16px "EB Garamond"', '400 16px "IM Fell English"',
+    'italic 400 16px "IM Fell English"', '400 16px "IM Fell English SC"', '500 20px "Caveat"'];
+  await Promise.race([
+    Promise.all(specs.map(s => document.fonts.load(s, 'aA\u00BD').catch(() => null))),
+    new Promise(r => setTimeout(r, 3500))
+  ]);
+}
+
+async function init() {
+  await loadFonts();
+  assemble();
+  layout(true, 0);
+  S.built = true;
+  const h = idxFromHash();
+  if (h != null) { setInstant(fFromIdx(h)); hideHint(); }
+  bind();
+  setTimeout(hideHint, 9000);
+  if (document.fonts && document.fonts.check && !document.fonts.check('16px "IM Fell English"')) {
+    document.fonts.ready.then(() => rebuildBook());
+  }
+}
+init();
+
+})();
+</script>
+</body>
+</html>
